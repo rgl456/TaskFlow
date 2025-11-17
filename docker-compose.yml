@@ -15,5 +15,8 @@ services:
 volumes:
   task-flow-data:
     driver: local
+networks:
+  task-flow-net:
+    driver: bridge
 
 

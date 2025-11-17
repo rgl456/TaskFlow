@@ -36,7 +36,7 @@ public class Company {
     @OneToMany(mappedBy = "company", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<CompanyMembership> memberships = new HashSet<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "company", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Project> projects = new HashSet<>();
 
     public Company() {
@@ -51,6 +51,10 @@ public class Company {
         this.updatedAt = updatedAt;
         this.memberships = memberships;
         this.projects = projects;
+    }
+
+    public Long getId(){
+        return id;
     }
 
     public String getName() {
