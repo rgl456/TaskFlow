@@ -1,0 +1,17 @@
+services:
+  task-flow-db:
+    image: mysql:latest
+    container_name: task-flow-db
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: task_flow
+    ports:
+      - 3307:3306
+    volumes:
+      - task-flow-data:/var/lib/mysql
+
+volumes:
+  task-flow-data:
+    driver: local
+
+
