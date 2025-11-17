@@ -30,4 +30,55 @@ public class Notification {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    public Notification() {
+    }
+
+    public Notification(Long id, String message, String type, Boolean readStatus, LocalDateTime createdAt, User user) {
+        this.id = id;
+        this.message = message;
+        this.type = type;
+        this.readStatus = readStatus;
+        this.createdAt = createdAt;
+        this.user = user;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public Boolean getReadStatus() {
+        return readStatus;
+    }
+
+    public void setReadStatus(Boolean readStatus) {
+        this.readStatus = readStatus;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
 }
