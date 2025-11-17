@@ -9,6 +9,8 @@ services:
       - 3307:3306
     volumes:
       - task-flow-data:/var/lib/mysql
+    networks:
+      - task-flow-net
 
 volumes:
   task-flow-data:
