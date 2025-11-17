@@ -7,21 +7,29 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "companies")
-public class Company {
+@Table(name = "tasks")
+public class Task {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
-    private String name;
+    private String title;
 
-    @Column(name = "owner_email", nullable = false)
-    private String ownerEmail;
+    @Column(columnDefinition = "TEXT")
+    private String description;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String location;
+    private Status status;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Priority priority;
+
+    @Column(name = "due_date", nullable = false)
+    private LocalDateTime dueDate;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -30,5 +38,8 @@ public class Company {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+
+
 
 }
