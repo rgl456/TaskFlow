@@ -82,6 +82,10 @@ public class User {
         this.notifications = notifications;
     }
 
+    public Long getId(){
+        return id;
+    }
+
     public String getName() {
         return name;
     }

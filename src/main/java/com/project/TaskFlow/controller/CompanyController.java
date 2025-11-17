@@ -1,11 +1,9 @@
 package com.project.TaskFlow.controller;
 
-import com.project.TaskFlow.dto.ApiResponse;
-import com.project.TaskFlow.dto.CompanyRequestDTO;
-import com.project.TaskFlow.dto.CompanyResponseDTO;
-import com.project.TaskFlow.model.Company;
+import com.project.TaskFlow.dto.*;
 import com.project.TaskFlow.service.CompanyService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -39,6 +37,24 @@ public class CompanyController {
                 .body(companyService.findCompanyById(id));
     }
 
+    @PutMapping("/{id}/owner")
+    public ResponseEntity<ApiResponse> updateOwnerEmailId(@PathVariable Long id, @Email @RequestParam("email") String email){
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ApiResponse(
+                        "owner email updated successfully!",
+                        companyService.updateOwnerEmailId(id, email),
+                        LocalDateTime.now()
+                ));
+    }
 
+    @PostMapping("/{id}/members")
+    public ResponseEntity<ApiResponse> addMemberToCompanyById(@PathVariable Long id, @Valid @RequestBody MemberRequestDTO requestDTO){
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ApiResponse(
+                        "user added to company successfully!",
+                        companyService.addUserToCompanyById(id, requestDTO),
+                        LocalDateTime.now())
+                );
+    }
 
 }

@@ -1,6 +1,7 @@
 package com.project.TaskFlow.model;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -17,6 +18,7 @@ public class CompanyMembership {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    @CreationTimestamp
     @Column(name = "joined_at", nullable = false, updatable = false)
     private LocalDateTime joinedAt;
 
@@ -37,6 +39,10 @@ public class CompanyMembership {
         this.joinedAt = joinedAt;
         this.company = company;
         this.user = user;
+    }
+
+    public Long getId(){
+        return id;
     }
 
     public Role getRole() {
