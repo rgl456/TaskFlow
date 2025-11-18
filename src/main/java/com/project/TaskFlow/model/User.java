@@ -25,10 +25,6 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Role role;
-
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -64,12 +60,11 @@ public class User {
     public User() {
     }
 
-    public User(Long id, String name, String email, String password, Role role, LocalDateTime createdAt, LocalDateTime updatedAt, Set<CompanyMembership> memberships, Set<Project> managingProjects, Set<Project> assignedProjects, Set<Task> assignedTasks, Set<TaskComment> comments, Set<TaskActivity> activities, Set<Attachment> uploadedAttachments, Set<Notification> notifications) {
+    public User(Long id, String name, String email, String password, LocalDateTime createdAt, LocalDateTime updatedAt, Set<CompanyMembership> memberships, Set<Project> managingProjects, Set<Project> assignedProjects, Set<Task> assignedTasks, Set<TaskComment> comments, Set<TaskActivity> activities, Set<Attachment> uploadedAttachments, Set<Notification> notifications) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.password = password;
-        this.role = role;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.memberships = memberships;
@@ -108,14 +103,6 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public Role getRole() {
-        return role;
-    }
-
-    public void setRole(Role role) {
-        this.role = role;
     }
 
     public LocalDateTime getCreatedAt() {

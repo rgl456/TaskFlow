@@ -1,6 +1,7 @@
 package com.project.TaskFlow.controller;
 
 import com.project.TaskFlow.dto.*;
+import com.project.TaskFlow.model.Role;
 import com.project.TaskFlow.service.CompanyService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
@@ -43,6 +44,16 @@ public class CompanyController {
                 .body(new ApiResponse(
                         "owner email updated successfully!",
                         companyService.updateOwnerEmailId(id, email),
+                        LocalDateTime.now()
+                ));
+    }
+
+    @PutMapping("/{id}/member/{memberId}/role")
+    public ResponseEntity<ApiResponse> updateRoleToMember(@PathVariable Long id, @PathVariable Long memberId, @RequestParam("role") Role role){
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ApiResponse(
+                        "role updated successfully! "+role,
+                        companyService.updateRoleToMember(id, memberId, role),
                         LocalDateTime.now()
                 ));
     }

@@ -8,6 +8,7 @@ import com.project.TaskFlow.mapper.CompanyMapper;
 import com.project.TaskFlow.mapper.CompanyMembershipMapper;
 import com.project.TaskFlow.model.Company;
 import com.project.TaskFlow.model.CompanyMembership;
+import com.project.TaskFlow.model.Role;
 import com.project.TaskFlow.model.User;
 import com.project.TaskFlow.repository.CompanyMembershipRepository;
 import com.project.TaskFlow.repository.CompanyRepository;
@@ -15,6 +16,8 @@ import com.project.TaskFlow.repository.UserRepository;
 import com.project.TaskFlow.service.CompanyService;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 
 @Service
@@ -33,10 +36,18 @@ public class CompanyServiceImpl implements CompanyService {
     @Override
     @Transactional
     public CompanyResponseDTO createCompany(CompanyRequestDTO companyRequestDTO) {
+        User owner = userRepository.findByEmail(companyRequestDTO.ownerEmail())
+                .orElseThrow(() -> new RuntimeException("Owner user not found"));
+
         if(companyRepository.existsByNameAndLocation(companyRequestDTO.name(), companyRequestDTO.location())){
             throw new RuntimeException("Company with same name & location already exists!");
         }
         Company savedCompany = companyRepository.save(CompanyMapper.dtoToEntity(companyRequestDTO));
+
+        CompanyMembership membership = CompanyMembershipMapper.dtoToEntity(savedCompany, owner, Role.OWNER);
+
+        companyMembershipRepository.save(membership);
+
         return CompanyMapper.entityToResponse(savedCompany);
     }
 
@@ -50,10 +61,39 @@ public class CompanyServiceImpl implements CompanyService {
     @Override
     @Transactional
     public CompanyResponseDTO updateOwnerEmailId(Long id, String email) {
+        User newOwner = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Owner user not found"));
+
         Company company = companyRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Company not found with this id "+ id));
+
+        CompanyMembership membership = companyMembershipRepository.findByCompanyAndRole(company, Role.OWNER)
+                .orElseThrow(() -> new RuntimeException("there is no owner assigned with this company"));
+
+        membership.setRole(Role.MEMBER);
+
+        companyMembershipRepository.save(membership);
+
+        boolean isNewOwnerBelongsToSameCompany = companyMembershipRepository.existsByCompanyAndUser(company, newOwner);
+
+        CompanyMembership newMemberShip;
+        if(!isNewOwnerBelongsToSameCompany){
+            newMemberShip = new CompanyMembership();
+            newMemberShip.setCompany(company);
+            membership.setUser(newOwner);
+            membership.setRole(Role.OWNER);
+        }
+        else{
+            newMemberShip = companyMembershipRepository.findByCompanyAndUser(company, newOwner)
+                    .orElseThrow(() -> new RuntimeException("this owner not belonged to this company"));
+            newMemberShip.setRole(Role.OWNER);
+        }
+
+        companyMembershipRepository.save(newMemberShip);
+        // what if multiple owners there
         company.setOwnerEmail(email);
         Company savedCompany = companyRepository.save(company);
+
         return CompanyMapper.entityToResponse(savedCompany);
     }
 
@@ -70,10 +110,28 @@ public class CompanyServiceImpl implements CompanyService {
             throw new RuntimeException("User already in this company");
         }
 
-        CompanyMembership savedMembership =
-                companyMembershipRepository.save(CompanyMembershipMapper.dtoToEntity(company, member, requestDTO));
+        CompanyMembership savedMembership = companyMembershipRepository
+                .save(CompanyMembershipMapper.dtoToEntity(company, member, requestDTO.role()));
+
+        return CompanyMembershipMapper.entityToResponse(savedMembership);
+    }
+
+    @Override
+    public CompanyMembershipResponseDTO updateRoleToMember(Long companyId, Long memberId, Role role) {
+
+        Company company = companyRepository.findById(companyId)
+                .orElseThrow(() -> new RuntimeException("Company not found with this id "+ companyId));
+        User member = userRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("User not found with this id "+ memberId));
+
+        CompanyMembership membership = companyMembershipRepository.findByCompanyAndUser(company, member)
+                .orElseThrow(() -> new RuntimeException("User not belonged in this company"));
+        membership.setRole(role);
+
+        CompanyMembership savedMembership = companyMembershipRepository.save(membership);
 
         return CompanyMembershipMapper.entityToResponse(savedMembership);
     }
 
 }
+

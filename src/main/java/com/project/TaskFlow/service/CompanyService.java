@@ -5,6 +5,7 @@ import com.project.TaskFlow.dto.CompanyRequestDTO;
 import com.project.TaskFlow.dto.CompanyResponseDTO;
 import com.project.TaskFlow.dto.MemberRequestDTO;
 import com.project.TaskFlow.mapper.CompanyMembershipMapper;
+import com.project.TaskFlow.model.Role;
 import jakarta.validation.Valid;
 
 public interface CompanyService {
@@ -12,4 +13,5 @@ public interface CompanyService {
     CompanyResponseDTO findCompanyById(Long id);
     CompanyResponseDTO updateOwnerEmailId(Long id, String email);
     CompanyMembershipResponseDTO addUserToCompanyById(Long id, MemberRequestDTO requestDTO);
+    CompanyMembershipResponseDTO updateRoleToMember(Long companyId, Long memberId, Role role);
 }
