@@ -40,17 +40,28 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         String jwtToken = authToken.substring(7);
-        String userEmail = jwtService.extractUserEmail(jwtToken);
+
+        String userEmail;
+        try {
+            userEmail = jwtService.extractUserEmail(jwtToken);
+        } catch (Exception ex) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         if(userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null){
             UserDetails userDetails = userDetailsService.loadUserByUsername(userEmail);
 
             if(jwtService.isTokenValid(jwtToken, userDetails)){
 
-                String role = jwtService.generateRole(jwtToken);
-
+                String tokenType = jwtService.extractTokenType(jwtToken);
                 List<GrantedAuthority> authorities = new ArrayList<>();
-                if(role != null){
-                    authorities.add(new SimpleGrantedAuthority("ROLE_"+role));
+
+                if(tokenType.equals("COMPANY")){
+                    String role = jwtService.extractRole(jwtToken);
+                    if(role != null){
+                        authorities.add(new SimpleGrantedAuthority("ROLE_"+role));
+                    }
                 }
 
                 UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(

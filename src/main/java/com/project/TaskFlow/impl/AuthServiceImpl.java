@@ -43,9 +43,6 @@ public class AuthServiceImpl implements AuthService{
         this.companyMembershipRepository = companyMembershipRepository;
     }
 
-    // Todo
-    // to implement jwt in register
-
     @Override
     public AuthResponseDTO register(UserRequestDTO requestDTO) {
         User user = UserMapper.dtoToEntity(requestDTO);  // name email password

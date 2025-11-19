@@ -12,7 +12,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.function.Function;
 
@@ -78,7 +77,11 @@ public class JwtService {
         return extractClaim(jwtToken, Claims::getSubject);
     }
 
-    public String generateRole(String jwtToken) {
+    public String extractTokenType(String jwtToken) {
+        return extractClaim(jwtToken, claims -> claims.get("tokenType", String.class));
+    }
+
+    public String extractRole(String jwtToken) {
         return extractClaim(jwtToken, claims -> claims.get("role", String.class));
     }
 
@@ -95,6 +98,5 @@ public class JwtService {
     private boolean isTokenExpired(String jwtToken) {
         return extractExpiration(jwtToken).before(new Date());
     }
-
 
 }
