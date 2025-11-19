@@ -2,12 +2,11 @@ package com.project.TaskFlow.dto;
 
 import java.time.LocalDateTime;
 
-public record AuthResponseDTO(
-        String email,
+public record CompanyTokenResponseDTO(
+        Long companyId,
+        Long userId,
         String role,
         String accessToken,
-        String refreshToken,
         String expireAt
 ) {
-
 }

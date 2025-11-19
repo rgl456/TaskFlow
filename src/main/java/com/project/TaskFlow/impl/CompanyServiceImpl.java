@@ -117,6 +117,7 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     @Override
+    @Transactional
     public CompanyMembershipResponseDTO updateRoleToMember(Long companyId, Long memberId, Role role) {
 
         Company company = companyRepository.findById(companyId)
