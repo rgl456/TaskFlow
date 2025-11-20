@@ -48,7 +48,7 @@ public class CompanyController {
                 ));
     }
 
-    @PutMapping("/{id}/member/{memberId}/role")
+    @PutMapping("/{id}/members/{memberId}/role")
     public ResponseEntity<ApiResponse> updateRoleToMember(@PathVariable Long id, @PathVariable Long memberId, @RequestParam("role") Role role){
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponse(

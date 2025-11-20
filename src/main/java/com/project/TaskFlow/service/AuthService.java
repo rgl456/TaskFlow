@@ -8,4 +8,5 @@ public interface AuthService {
     AuthResponseDTO register(UserRequestDTO requestDTO);
     AuthResponseDTO authenticate(AuthRequestDTO authRequestDTO);
     CompanyTokenResponseDTO switchCompany(@Valid CompanySwitchRequestDTO requestDTO);
+    Object refresh(@Valid RefreshTokenRequestDTO requestDTO);
 }

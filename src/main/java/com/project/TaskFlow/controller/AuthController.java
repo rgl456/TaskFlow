@@ -52,4 +52,14 @@ public class AuthController {
                 ));
     }
 
+    @PostMapping("/refresh")
+    public ResponseEntity<?> refreshToken(@Valid @RequestBody RefreshTokenRequestDTO requestDTO){
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ApiResponse(
+                        "new Access token generated successfully!",
+                        authService.refresh(requestDTO),
+                        LocalDateTime.now()
+                ));
+    }
+
 }

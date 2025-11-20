@@ -6,6 +6,6 @@ import jakarta.validation.constraints.NotNull;
 
 public record MemberRequestDTO(
         @NotNull Long userId,
-        @NotBlank Role role
+        @NotNull Role role
 ) {
 }

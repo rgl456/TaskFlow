@@ -10,6 +10,7 @@ import com.project.TaskFlow.model.User;
 import com.project.TaskFlow.repository.CompanyMembershipRepository;
 import com.project.TaskFlow.repository.CompanyRepository;
 import com.project.TaskFlow.repository.UserRepository;
+import com.project.TaskFlow.security.CustomUserDetails;
 import com.project.TaskFlow.service.AuthService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -111,6 +112,51 @@ public class AuthServiceImpl implements AuthService{
                 membership.getUser().getId(),
                 membership.getRole().name(),
                 companyAccessToken,
+                expireAt
+        );
+
+    }
+
+    @Override
+    public Object refresh(RefreshTokenRequestDTO requestDTO) {
+        String refreshToken = requestDTO.refreshToken();
+        String email = jwtService.extractUserEmail(refreshToken);
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("user not found!"));
+
+        UserDetails userDetails = new CustomUserDetails(user);
+
+        if (!jwtService.isTokenValid(refreshToken, userDetails)) {
+            throw new RuntimeException("Invalid Refresh Token");
+        }
+
+        String newAccessToken = "";
+
+        if(requestDTO.companyId() != null){
+            Company company = companyRepository.findById(requestDTO.companyId())
+                    .orElseThrow(() -> new RuntimeException("Company not found with this id "+ requestDTO.companyId()));
+            CompanyMembership companyMembership = companyMembershipRepository.findByCompanyAndUser(company, user)
+                    .orElseThrow(() -> new RuntimeException("User not belonged in this company"));
+            newAccessToken = jwtService.generateCompanyAccessToken(user, requestDTO.companyId(), companyMembership.getRole());
+
+            String expireAt = jwtService.extractExpiration(newAccessToken).toString();
+
+            return new CompanyTokenResponseDTO(
+                    companyMembership.getCompany().getId(),
+                    companyMembership.getUser().getId(),
+                    companyMembership.getRole().name(),
+                    newAccessToken,
+                    expireAt
+            );
+        }
+
+        newAccessToken = jwtService.generateAccessToken(user);
+        String expireAt = jwtService.extractExpiration(newAccessToken).toString();
+        return new AuthResponseDTO(
+                email,
+                "",
+                newAccessToken,
+                refreshToken,
                 expireAt
         );
 
