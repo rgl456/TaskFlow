@@ -5,5 +5,7 @@ import com.project.TaskFlow.dto.UserUpdateRequestDTO;
 
 public interface UserService {
     UserResponseDTO getUserById(Long userId);
+    UserResponseDTO getUserById();
     UserResponseDTO updateUser(UserUpdateRequestDTO requestDTO);
+    String deleteUserById(Long userId);
 }

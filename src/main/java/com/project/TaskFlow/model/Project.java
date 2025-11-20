@@ -64,6 +64,10 @@ public class Project {
         this.tasks = tasks;
     }
 
+    public Long getId(){
+        return id;
+    }
+
     public String getName() {
         return name;
     }

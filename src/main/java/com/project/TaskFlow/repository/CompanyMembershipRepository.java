@@ -17,4 +17,5 @@ public interface CompanyMembershipRepository extends JpaRepository<CompanyMember
     Optional<CompanyMembership> findByCompanyAndRole(Company company, Role role);
     Optional<CompanyMembership> findByCompanyAndUser(Company company, User newOwner);
     List<CompanyMembership> findAllByUser(User user);
+    Boolean existsByUserAndRole(User user, Role role);
 }

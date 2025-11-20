@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -22,6 +23,7 @@ public class CompanyController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse> createCompany(@Valid @RequestBody CompanyRequestDTO companyRequestDTO){
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new ApiResponse(
@@ -33,12 +35,14 @@ public class CompanyController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CompanyOwnerResponseDTO> findCompanyById(@PathVariable Long id){
         return ResponseEntity.status(HttpStatus.OK)
                 .body(companyService.findCompanyById(id));
     }
 
     @PutMapping("/{id}/owner")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse> updateOwnerEmailId(@PathVariable Long id, @Email @RequestParam("email") String email){
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponse(
@@ -49,6 +53,7 @@ public class CompanyController {
     }
 
     @PutMapping("/{id}/members/{memberId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'MANAGER')")
     public ResponseEntity<ApiResponse> updateRoleFromUserToMember(@PathVariable Long id, @PathVariable Long memberId){
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponse(
@@ -59,6 +64,7 @@ public class CompanyController {
     }
 
     @PutMapping("/{id}/members/{memberId}")
+    @PreAuthorize("hasRole('ADMIN', 'OWNER')")
     public ResponseEntity<ApiResponse> updateRoleFromUserToManager(@PathVariable Long id, @PathVariable Long memberId){
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponse(
@@ -69,6 +75,7 @@ public class CompanyController {
     }
 
     @PostMapping("/{id}/members")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'MANAGER')")
     public ResponseEntity<ApiResponse> addMemberToCompanyById(@PathVariable Long id, @Valid @RequestBody MemberRequestDTO requestDTO){
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponse(
