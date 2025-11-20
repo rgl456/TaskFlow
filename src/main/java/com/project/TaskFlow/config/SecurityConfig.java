@@ -30,7 +30,6 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-
         return http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
@@ -42,7 +41,6 @@ public class SecurityConfig {
                 .build();
     }
 
-
     @Bean
     public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
@@ -52,6 +50,7 @@ public class SecurityConfig {
     public AuthenticationManager authentication(AuthenticationConfiguration configuration) throws Exception {
         return configuration.getAuthenticationManager();
     }
+
 //                .cors(cors -> cors.configurationSource(request -> {
 //                    CorsConfiguration config = new CorsConfiguration();
 //                    config.setAllowedOrigins(List.of("http://localhost:3000")); // FE URL
@@ -61,7 +60,6 @@ public class SecurityConfig {
 //                    config.setAllowCredentials(true);
 //                    return config;
 //                }))
-
 
 }
 

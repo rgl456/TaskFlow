@@ -1,6 +1,6 @@
 package com.project.TaskFlow.dto;
 
-public record CompanyResponseDTO(
+public record CompanyOwnerResponseDTO(
         Long id,
         String name,
         String ownerEmail,

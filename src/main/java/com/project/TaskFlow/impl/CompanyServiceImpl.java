@@ -2,7 +2,7 @@ package com.project.TaskFlow.impl;
 
 import com.project.TaskFlow.dto.CompanyMembershipResponseDTO;
 import com.project.TaskFlow.dto.CompanyRequestDTO;
-import com.project.TaskFlow.dto.CompanyResponseDTO;
+import com.project.TaskFlow.dto.CompanyOwnerResponseDTO;
 import com.project.TaskFlow.dto.MemberRequestDTO;
 import com.project.TaskFlow.mapper.CompanyMapper;
 import com.project.TaskFlow.mapper.CompanyMembershipMapper;
@@ -16,8 +16,6 @@ import com.project.TaskFlow.repository.UserRepository;
 import com.project.TaskFlow.service.CompanyService;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 
 @Service
@@ -35,7 +33,7 @@ public class CompanyServiceImpl implements CompanyService {
 
     @Override
     @Transactional
-    public CompanyResponseDTO createCompany(CompanyRequestDTO companyRequestDTO) {
+    public CompanyOwnerResponseDTO createCompany(CompanyRequestDTO companyRequestDTO) {
         User owner = userRepository.findByEmail(companyRequestDTO.ownerEmail())
                 .orElseThrow(() -> new RuntimeException("Owner user not found"));
 
@@ -52,7 +50,7 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     @Override
-    public CompanyResponseDTO findCompanyById(Long id) {
+    public CompanyOwnerResponseDTO findCompanyById(Long id) {
         Company company = companyRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Company not found with this id "+ id));
         return CompanyMapper.entityToResponse(company);
@@ -60,7 +58,7 @@ public class CompanyServiceImpl implements CompanyService {
 
     @Override
     @Transactional
-    public CompanyResponseDTO updateOwnerEmailId(Long id, String email) {
+    public CompanyOwnerResponseDTO updateOwnerEmailId(Long id, String email) {
         User newOwner = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Owner user not found"));
 
@@ -80,8 +78,8 @@ public class CompanyServiceImpl implements CompanyService {
         if(!isNewOwnerBelongsToSameCompany){
             newMemberShip = new CompanyMembership();
             newMemberShip.setCompany(company);
-            membership.setUser(newOwner);
-            membership.setRole(Role.OWNER);
+            newMemberShip.setUser(newOwner);
+            newMemberShip.setRole(Role.OWNER);
         }
         else{
             newMemberShip = companyMembershipRepository.findByCompanyAndUser(company, newOwner)
@@ -90,7 +88,7 @@ public class CompanyServiceImpl implements CompanyService {
         }
 
         companyMembershipRepository.save(newMemberShip);
-        // what if multiple owners there
+
         company.setOwnerEmail(email);
         Company savedCompany = companyRepository.save(company);
 
@@ -118,7 +116,17 @@ public class CompanyServiceImpl implements CompanyService {
 
     @Override
     @Transactional
-    public CompanyMembershipResponseDTO updateRoleToMember(Long companyId, Long memberId, Role role) {
+    public CompanyMembershipResponseDTO updateRoleFromUserToMember(Long companyId, Long memberId) {
+        return updateRoleToUser(companyId, memberId, Role.MEMBER);
+    }
+
+    @Override
+    @Transactional
+    public CompanyMembershipResponseDTO updateRoleFromUserToManager(Long companyId, Long memberId) {
+        return updateRoleToUser(companyId, memberId, Role.MANAGER);
+    }
+
+    public CompanyMembershipResponseDTO updateRoleToUser(Long companyId, Long memberId, Role role) {
 
         Company company = companyRepository.findById(companyId)
                 .orElseThrow(() -> new RuntimeException("Company not found with this id "+ companyId));
@@ -127,6 +135,7 @@ public class CompanyServiceImpl implements CompanyService {
 
         CompanyMembership membership = companyMembershipRepository.findByCompanyAndUser(company, member)
                 .orElseThrow(() -> new RuntimeException("User not belonged in this company"));
+
         membership.setRole(role);
 
         CompanyMembership savedMembership = companyMembershipRepository.save(membership);

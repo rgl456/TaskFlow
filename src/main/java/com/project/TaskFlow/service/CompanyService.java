@@ -2,16 +2,14 @@ package com.project.TaskFlow.service;
 
 import com.project.TaskFlow.dto.CompanyMembershipResponseDTO;
 import com.project.TaskFlow.dto.CompanyRequestDTO;
-import com.project.TaskFlow.dto.CompanyResponseDTO;
+import com.project.TaskFlow.dto.CompanyOwnerResponseDTO;
 import com.project.TaskFlow.dto.MemberRequestDTO;
-import com.project.TaskFlow.mapper.CompanyMembershipMapper;
-import com.project.TaskFlow.model.Role;
-import jakarta.validation.Valid;
 
 public interface CompanyService {
-    CompanyResponseDTO createCompany(CompanyRequestDTO companyRequestDTO);
-    CompanyResponseDTO findCompanyById(Long id);
-    CompanyResponseDTO updateOwnerEmailId(Long id, String email);
+    CompanyOwnerResponseDTO createCompany(CompanyRequestDTO companyRequestDTO);
+    CompanyOwnerResponseDTO findCompanyById(Long id);
+    CompanyOwnerResponseDTO updateOwnerEmailId(Long id, String email);
     CompanyMembershipResponseDTO addUserToCompanyById(Long id, MemberRequestDTO requestDTO);
-    CompanyMembershipResponseDTO updateRoleToMember(Long companyId, Long memberId, Role role);
+    CompanyMembershipResponseDTO updateRoleFromUserToMember(Long id, Long memberId);
+    CompanyMembershipResponseDTO updateRoleFromUserToManager(Long id, Long memberId);
 }

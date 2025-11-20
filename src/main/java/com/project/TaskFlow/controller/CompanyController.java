@@ -33,7 +33,7 @@ public class CompanyController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CompanyResponseDTO> findCompanyById(@PathVariable Long id){
+    public ResponseEntity<CompanyOwnerResponseDTO> findCompanyById(@PathVariable Long id){
         return ResponseEntity.status(HttpStatus.OK)
                 .body(companyService.findCompanyById(id));
     }
@@ -48,12 +48,22 @@ public class CompanyController {
                 ));
     }
 
-    @PutMapping("/{id}/members/{memberId}/role")
-    public ResponseEntity<ApiResponse> updateRoleToMember(@PathVariable Long id, @PathVariable Long memberId, @RequestParam("role") Role role){
+    @PutMapping("/{id}/members/{memberId}")
+    public ResponseEntity<ApiResponse> updateRoleFromUserToMember(@PathVariable Long id, @PathVariable Long memberId){
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponse(
-                        "role updated successfully! "+role,
-                        companyService.updateRoleToMember(id, memberId, role),
+                        "role updated successfully to MEMBER!",
+                        companyService.updateRoleFromUserToMember(id, memberId),
+                        LocalDateTime.now()
+                ));
+    }
+
+    @PutMapping("/{id}/members/{memberId}")
+    public ResponseEntity<ApiResponse> updateRoleFromUserToManager(@PathVariable Long id, @PathVariable Long memberId){
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ApiResponse(
+                        "role updated successfully to MANAGER!",
+                        companyService.updateRoleFromUserToManager(id, memberId),
                         LocalDateTime.now()
                 ));
     }

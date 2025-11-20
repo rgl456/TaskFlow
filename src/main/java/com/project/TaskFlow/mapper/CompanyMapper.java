@@ -1,10 +1,8 @@
 package com.project.TaskFlow.mapper;
 
 import com.project.TaskFlow.dto.CompanyRequestDTO;
-import com.project.TaskFlow.dto.CompanyResponseDTO;
+import com.project.TaskFlow.dto.CompanyOwnerResponseDTO;
 import com.project.TaskFlow.model.Company;
-
-import java.time.LocalDateTime;
 
 public class CompanyMapper {
 
@@ -16,8 +14,8 @@ public class CompanyMapper {
         return company;
     }
 
-    public static CompanyResponseDTO entityToResponse(Company company){
-        return new CompanyResponseDTO(
+    public static CompanyOwnerResponseDTO entityToResponse(Company company){
+        return new CompanyOwnerResponseDTO(
                 company.getId(),
                 company.getName(),
                 company.getOwnerEmail(),
