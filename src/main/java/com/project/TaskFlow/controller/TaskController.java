@@ -6,10 +6,8 @@ import com.project.TaskFlow.service.TaskService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 
@@ -24,6 +22,7 @@ public class TaskController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'MANAGER')")
     public ResponseEntity<ApiResponse> createTask(@Valid @RequestBody TaskRequestDTO taskRequestDTO){
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ApiResponse(
@@ -32,4 +31,15 @@ public class TaskController {
                         LocalDateTime.now()
                 ));
     }
+
+    @GetMapping("/{taskId}")
+    public ResponseEntity<ApiResponse> getTaskById(@PathVariable Long taskId){
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ApiResponse(
+                        "Task fetched successfully!",
+                        taskService.getTaskById(taskId),
+                        LocalDateTime.now()
+                ));
+    }
+
 }

@@ -77,6 +77,10 @@ public class Task {
         this.attachments = attachments;
     }
 
+    public Long getId() {
+        return id;
+    }
+
     public String getTitle() {
         return title;
     }
