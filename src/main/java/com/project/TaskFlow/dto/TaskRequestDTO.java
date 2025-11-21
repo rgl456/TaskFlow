@@ -11,7 +11,7 @@ public record TaskRequestDTO(
         @NotNull Long projectId,
         @NotBlank String title,
         String description,
-        @NotNull Status status,
+        Status status,
         Priority priority,
         LocalDateTime dueDate
 ) {

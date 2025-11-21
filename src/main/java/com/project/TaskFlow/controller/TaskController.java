@@ -42,4 +42,36 @@ public class TaskController {
                 ));
     }
 
+    @PutMapping("/{taskId}")
+    public ResponseEntity<ApiResponse> updateTaskById(@PathVariable Long taskId, @Valid @RequestBody TaskRequestDTO requestDTO){
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ApiResponse(
+                        "Task updated successfully!",
+                        taskService.updateTaskById(taskId, requestDTO),
+                        LocalDateTime.now()
+                ));
+    }
+
+    @DeleteMapping("/{taskId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'MANAGER')")
+    public ResponseEntity<ApiResponse> deleteTaskById(@PathVariable Long taskId){
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ApiResponse(
+                        "Task deleted successfully!",
+                        taskService.deleteTaskById(taskId),
+                        LocalDateTime.now()
+                ));
+    }
+
+    @PutMapping("/{taskId}/member/{memberId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'MANAGER')")
+    public ResponseEntity<ApiResponse> assignTaskToMember(@PathVariable Long taskId, @PathVariable Long memberId){
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ApiResponse(
+                        "Task "+ taskId +" assigned successfully! to the member "+ memberId,
+                        taskService.assignTaskToMember(taskId, memberId),
+                        LocalDateTime.now()
+                ));
+    }
+
 }
