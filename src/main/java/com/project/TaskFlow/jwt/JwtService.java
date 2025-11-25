@@ -29,6 +29,18 @@ public class JwtService {
         return createToken(user, 7*1000*60*60*24);
     }
 
+    public String generateAdminToken(User user) {
+        return Jwts.builder()
+                .claim("userId", user.getId())
+                .claim("role", "ADMIN")
+                .claim("tokenType", "ADMIN")
+                .setSubject(user.getEmail())
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60))
+                .signWith(getSignInKey(), SignatureAlgorithm.HS256)
+                .compact();
+    }
+
     public String createToken(User user, Integer expireTime){
         return Jwts
                 .builder()

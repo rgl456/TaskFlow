@@ -63,7 +63,7 @@ public class CompanyController {
                 ));
     }
 
-    @PutMapping("/{id}/members/{memberId}")
+    @PutMapping("/{id}/managers/{memberId}")
     @PreAuthorize("hasRole('ADMIN', 'OWNER')")
     public ResponseEntity<ApiResponse> updateRoleFromUserToManager(@PathVariable Long id, @PathVariable Long memberId){
         return ResponseEntity.status(HttpStatus.OK)
@@ -86,4 +86,3 @@ public class CompanyController {
     }
 
 }
-

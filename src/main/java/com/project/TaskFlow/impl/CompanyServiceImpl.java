@@ -15,7 +15,11 @@ import com.project.TaskFlow.repository.CompanyRepository;
 import com.project.TaskFlow.repository.UserRepository;
 import com.project.TaskFlow.service.CompanyService;
 import jakarta.transaction.Transactional;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+
+import javax.swing.text.html.Option;
+import java.util.Optional;
 
 
 @Service
@@ -98,6 +102,9 @@ public class CompanyServiceImpl implements CompanyService {
     @Override
     @Transactional
     public CompanyMembershipResponseDTO addUserToCompanyById(Long id, MemberRequestDTO requestDTO) {
+        if (requestDTO.role() == Role.OWNER || requestDTO.role() == Role.ADMIN) {
+            throw new RuntimeException("Security Violation: You cannot add a user directly as OWNER.");
+        }
         Company company = companyRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Company not found with this id "+ id));
 
@@ -128,17 +135,30 @@ public class CompanyServiceImpl implements CompanyService {
 
     public CompanyMembershipResponseDTO updateRoleToUser(Long companyId, Long memberId, Role role) {
 
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User currentUser = userRepository.findByEmail(email).orElseThrow();
+
         Company company = companyRepository.findById(companyId)
                 .orElseThrow(() -> new RuntimeException("Company not found with this id "+ companyId));
-        User member = userRepository.findById(memberId)
+        User targetUser = userRepository.findById(memberId)
                 .orElseThrow(() -> new RuntimeException("User not found with this id "+ memberId));
 
-        CompanyMembership membership = companyMembershipRepository.findByCompanyAndUser(company, member)
-                .orElseThrow(() -> new RuntimeException("User not belonged in this company"));
+        CompanyMembership targetMembership = companyMembershipRepository.findByCompanyAndUser(company, targetUser)
+                .orElseThrow(() -> new RuntimeException("target User not belonged in this company"));
 
-        membership.setRole(role);
+        if (targetMembership.getRole() == Role.OWNER || targetMembership.getRole() == Role.ADMIN) {
+            throw new RuntimeException("You don't have access to change the role of an OWNER.");
+        }
 
-        CompanyMembership savedMembership = companyMembershipRepository.save(membership);
+        Optional<CompanyMembership> membership = companyMembershipRepository.findByCompanyAndUser(company, currentUser);
+        if(membership.get().getRole() == Role.MANAGER){
+            if (targetMembership.getRole() == Role.MANAGER) {
+                throw new RuntimeException("Access Denied: Managers cannot modify other Managers.");
+            }
+        }
+        membership.get().setRole(role);
+
+        CompanyMembership savedMembership = companyMembershipRepository.save(membership.get());
 
         return CompanyMembershipMapper.entityToResponse(savedMembership);
     }

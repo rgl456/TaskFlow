@@ -12,6 +12,7 @@ import com.project.TaskFlow.repository.CompanyRepository;
 import com.project.TaskFlow.repository.UserRepository;
 import com.project.TaskFlow.security.CustomUserDetails;
 import com.project.TaskFlow.service.AuthService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -44,19 +45,33 @@ public class AuthServiceImpl implements AuthService{
         this.companyMembershipRepository = companyMembershipRepository;
     }
 
+    @Value("${app.admin.email}")
+    private String adminEmail;
+
     @Override
     public AuthResponseDTO register(UserRequestDTO requestDTO) {
-        User user = UserMapper.dtoToEntity(requestDTO);  // name email password
+        if(userRepository.existsByEmail(requestDTO.email())){
+            throw new RuntimeException("User already exists");
+        }
+        User user = UserMapper.dtoToEntity(requestDTO);
         user.setPassword(passwordEncoder.encode(requestDTO.password()));
         User savedUser = userRepository.save(user);
 
-        String accessToken = jwtService.generateAccessToken(savedUser);
-        String refreshToken = jwtService.generateRefreshToken(savedUser);
+        String refreshToken = jwtService.generateRefreshToken(user);
+        String accessToken;
+        String role = "";
+        if (user.getEmail().equals(adminEmail)) {
+            accessToken = jwtService.generateAdminToken(user);
+            role = "ADMIN";
+        } else {
+            accessToken = jwtService.generateAccessToken(user);
+            role = "USER";
+        }
         String expireAt = jwtService.extractExpiration(accessToken).toString();
 
         return new AuthResponseDTO(
-                savedUser.getEmail(),
-                "",
+                requestDTO.email(),
+                role,
                 accessToken,
                 refreshToken,
                 expireAt
@@ -74,13 +89,21 @@ public class AuthServiceImpl implements AuthService{
         User user = userRepository.findByEmail(authRequestDTO.email())
                 .orElseThrow(() -> new RuntimeException("User not belonged in this company"));
 
-        String accessToken = jwtService.generateAccessToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);
+        String accessToken;
+        String role = "";
+        if (user.getEmail().equals(adminEmail)) {
+            accessToken = jwtService.generateAdminToken(user);
+            role = "ADMIN";
+        } else {
+            accessToken = jwtService.generateAccessToken(user);
+            role = "USER";
+        }
         String expireAt = jwtService.extractExpiration(accessToken).toString();
 
         return new AuthResponseDTO(
                 authRequestDTO.email(),
-                "",
+                role,
                 accessToken,
                 refreshToken,
                 expireAt
